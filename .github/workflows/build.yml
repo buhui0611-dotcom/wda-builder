@@ -44,7 +44,8 @@ jobs:
             ARCHS=arm64 \
             ONLY_ACTIVE_ARCH=NO \
             clean build \
-            CONFIGURATION_BUILD_DIR=$PWD/build 2>&1 | tail -30
+            CONFIGURATION_BUILD_DIR=$PWD/build > xcodebuild.log 2>&1; echo "EXIT=$?"
+          tail -80 xcodebuild.log
 
       - name: Fix xctest signing for Sideloadly
         run: |
@@ -126,6 +127,14 @@ jobs:
           cp -r build/WebDriverAgentRunner-Runner.app Payload/
           zip -r WebDriverAgent-iOS18.ipa Payload/
           ls -lh WebDriverAgent-iOS18.ipa
+
+      - name: Upload build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcodebuild-log
+          path: xcodebuild.log
+          retention-days: 7
 
       - name: Upload
         uses: actions/upload-artifact@v4
