@@ -30,6 +30,11 @@ jobs:
             bash ./Scripts/bootstrap.sh -d
           fi
 
+      - name: Strip asset catalog (actool needs simulator runtime on GH runners)
+        run: |
+          sed -i '' '/Assets.xcassets/d' WebDriverAgent.xcodeproj/project.pbxproj
+          grep -c "Assets.xcassets" WebDriverAgent.xcodeproj/project.pbxproj || echo "assets removed"
+
       - name: Build WDA
         run: |
           xcodebuild \
